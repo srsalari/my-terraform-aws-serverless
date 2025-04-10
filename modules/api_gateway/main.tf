@@ -9,16 +9,16 @@ resource "aws_api_gateway_resource" "records" {
   path_part   = "records"
 }
 
-resource "aws_api_gateway_resource" "processobject" {
+resource "aws_api_gateway_resource" "process_object" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   parent_id   = aws_api_gateway_rest_api.api.root_resource_id
-  path_part   = "processobject"
+  path_part   = "process_object"
 }
 
-resource "aws_api_gateway_resource" "startglue" {
+resource "aws_api_gateway_resource" "start_glue" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   parent_id   = aws_api_gateway_rest_api.api.root_resource_id
-  path_part   = "startglue"
+  path_part   = "start_glue"
 }
 
 resource "aws_lambda_permission" "allow_api_gateway_records" {
@@ -36,12 +36,15 @@ resource "aws_api_gateway_method" "post_records" {
   resource_id   = aws_api_gateway_resource.records.id
   http_method   = "POST"
   authorization = "NONE"
+}
 
-  integration {
-    type             = "AWS_PROXY"
-    integration_http_method = "POST"
-    uri              = module.lambda.process_dynamodb_invoke_arn
-  }
+resource "aws_api_gateway_integration" "post_records_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.api.id
+  resource_id             = aws_api_gateway_resource.records.id
+  http_method             = aws_api_gateway_method.post_records.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = module.lambda.process_dynamodb_invoke_arn
 }
 
 resource "aws_lambda_permission" "allow_api_gateway_processobject" {
@@ -53,17 +56,11 @@ resource "aws_lambda_permission" "allow_api_gateway_processobject" {
   source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/resources/${aws_api_gateway_resource.processobject.id}/methods/POST"
 }
 
-resource "aws_api_gateway_method" "post_processobject" {
+resource "aws_api_gateway_method" "post_process_object" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
-  resource_id   = aws_api_gateway_resource.processobject.id
+  resource_id   = aws_api_gateway_resource.process_object.id
   http_method   = "POST"
   authorization = "NONE"
-
-  integration {
-    type             = "AWS_PROXY"
-    integration_http_method = "POST"
-    uri              = module.lambda.process_s3_invoke_arn
-  }
 }
 
 resource "aws_lambda_permission" "allow_api_gateway_startglue" {
@@ -75,17 +72,11 @@ resource "aws_lambda_permission" "allow_api_gateway_startglue" {
   source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/resources/${aws_api_gateway_resource.startglue.id}/methods/POST"
 }
 
-resource "aws_api_gateway_method" "post_startglue" {
+resource "aws_api_gateway_method" "post_start_glue" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
-  resource_id   = aws_api_gateway_resource.startglue.id
+  resource_id   = aws_api_gateway_resource.start_glue.id
   http_method   = "POST"
   authorization = "NONE"
-
-  integration {
-    type             = "AWS_PROXY"
-    integration_http_method = "POST"
-    uri              = module.lambda.process_glue_invoke_arn
-  }
 }
 
 resource "aws_api_gateway_deployment" "api_deployment" {

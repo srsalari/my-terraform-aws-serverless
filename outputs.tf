@@ -1,5 +1,5 @@
 output "api_gateway_url" {
-  value = module.api_gateway.api_gateway_url
+  value = aws_api_gateway_stage.api_stage.invoke_url
 }
 
 output "process_dynamodb_lambda_arn" {

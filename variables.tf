@@ -1,3 +1,8 @@
+variable "region" {
+  description = "The AWS region to deploy resources"
+  type        = string
+  default     = "ca-central-1"
+}
 variable "api_gateway_name" {
   description = "The name of the API Gateway"
   type        = string
@@ -13,7 +18,7 @@ variable "dynamodb_table_name" {
 variable "s3_bucket_name" {
   description = "The name of the S3 bucket"
   type        = string
-  default     = "my-s3-bucket-unique-name"
+  default     = "movie-agency-s3-bucket-03-2025"
 }
 
 variable "glue_job_name" {
@@ -28,8 +33,5 @@ variable "lambda_role_name" {
   default     = "Role-1"
 }
 
-variable "region" {
-  description = "The AWS region to deploy resources"
-  type        = string
-  default     = "ca-central-1"
-}
+
+
